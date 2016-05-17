@@ -39,16 +39,22 @@ foreach ($input as $line) {
 	$min_year		= $line[4];
 	$max_year		= $line[5];
 
-	//Create the TLD in tbldomainpricing
-	$TLD_create->bindParam(':tld', $tld);
-	$TLD_create->execute();
-
-	//GET TLD'S ID AND ASSIGN IT TO $tld_id
+	//Check if TLD exists. If not, create it and get its ID.
 	$TLD_get_id->bindParam(':tld', $tld);
 	$TLD_get_id->execute();
 	$result = $TLD_get_id->fetch();
 	$tld_id = $result[id];
+	if (!tld_id) {
+		//Create the TLD in tbldomainpricing
+		$TLD_create->bindParam(':tld', $tld);
+		$TLD_create->execute();
 
+		//GET TLD'S ID AND ASSIGN IT TO $tld_id
+		$TLD_get_id->bindParam(':tld', $tld);
+		$TLD_get_id->execute();
+		$result = $TLD_get_id->fetch();
+		$tld_id = $result[id];
+	}
 	//Create an array we'll loop for rather than writing nearly identical code 3 times
 	$type_array = [	["domainregister", $reg_price],
 					["domaintransfer", $transfer_price],
